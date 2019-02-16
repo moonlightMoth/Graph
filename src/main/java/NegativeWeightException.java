@@ -1,0 +1,4 @@
+class NegativeWeightException extends IllegalArgumentException
+{
+
+}
