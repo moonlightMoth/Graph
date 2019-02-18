@@ -4,8 +4,8 @@ import java.util.*;
 
 public class Graph
 {
-    private HashSet<Node> nodes;
-    private HashMap<Edge, Integer> edges;
+    private Set<Node> nodes;
+    private Map<Edge, Integer> edges;
 
     private final int HASHCODE_DIVIDER = 2;
 
@@ -15,13 +15,13 @@ public class Graph
         edges = new HashMap<>();
     }
 
-    public Graph(@NotNull HashSet<Node> nodes, @NotNull HashMap<Edge, Integer> edges)
+    public Graph(@NotNull Set<Node> nodes, @NotNull Map<Edge, Integer> edges)
     {
         this.nodes = nodes;
         this.edges = edges;
     }
 
-    public Graph(@NotNull HashSet<Node> nodes, @NotNull HashSet<WeightedEdge> weightedEdges)
+    public Graph(@NotNull Set<Node> nodes, @NotNull Set<WeightedEdge> weightedEdges)
     {
         this.nodes = nodes;
 
@@ -31,7 +31,7 @@ public class Graph
         }
     }
 
-    public Graph(@NotNull HashSet<Node> nodes)
+    public Graph(@NotNull Set<Node> nodes)
     {
         this.nodes = nodes;
         edges = new HashMap<>();
@@ -60,7 +60,7 @@ public class Graph
 
     public void addEdge(@NotNull String fromNode, @NotNull String toNode, @NotNull int weight)
     {
-        Edge edge = new Edge(fromNode, toNode);
+        Edge edge = new Edge(fromNode, toNode); //TODO add existing Nodes into Edges
 
         addEdge(edge, weight);
     }
@@ -75,21 +75,10 @@ public class Graph
         edges.remove(new Edge(fromNode, toNode));
     }
 
-    public void deleteEdge(@NotNull Edge edge)
-    {
-        edges.remove(edge);
-    }
-
     public void deleteNode(@NotNull String node)
     {
         nodes.remove(new Node(node));
         deleteAllLinkedEdges(new Node(node));
-    }
-
-    public void deleteNode(@NotNull Node node)
-    {
-        nodes.remove(node);
-        deleteAllLinkedEdges(node);
     }
 
     public void changeNodeName(@NotNull String oldName, @NotNull String newName)
@@ -103,7 +92,7 @@ public class Graph
         nodes.remove(new Node(oldName));
         nodes.add(new Node(newName));
 
-        changeNodeNameInEdges(oldName, newName);
+        changeNodeNameInEdges(oldName, newName); //TODO just change node name, not doing crap?
     }
 
     public void changeEdgeWeight(@NotNull String fromNode, @NotNull String toNode, @NotNull int newWeight)
@@ -167,7 +156,7 @@ public class Graph
         nodes.clear();
     }
 
-    public HashSet<Node> getNodes()
+    public Set<Node> getNodes()
     {
        return nodes;
     }
