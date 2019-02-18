@@ -1,153 +1,161 @@
-import java.util.HashSet;
+import com.sun.istack.internal.NotNull;
+
+import java.util.*;
 
 public class Graph
 {
-    public HashSet<Node> nodes;
-    public HashSet<Edge> edges;
+    private HashSet<Node> nodes;
+    private HashMap<Edge, Integer> edges;
 
     private final int HASHCODE_DIVIDER = 2;
 
-    Graph()
+    public Graph()
     {
         nodes = new HashSet<>();
-        edges = new HashSet<>();
+        edges = new HashMap<>();
     }
 
-    Graph(HashSet<Node> nodes, HashSet<Edge> edges)
+    public Graph(@NotNull HashSet<Node> nodes, @NotNull HashMap<Edge, Integer> edges)
     {
         this.nodes = nodes;
         this.edges = edges;
     }
 
-    Graph(HashSet<Node> nodes)
+    public Graph(@NotNull HashSet<Node> nodes, @NotNull HashSet<WeightedEdge> weightedEdges)
     {
         this.nodes = nodes;
-        edges = new HashSet<>();
+
+        for (WeightedEdge we : weightedEdges)
+        {
+            edges.put(we.getEdge(), we.getWeight());
+        }
     }
 
-    public void addNode(Node node)
+    public Graph(@NotNull HashSet<Node> nodes)
+    {
+        this.nodes = nodes;
+        edges = new HashMap<>();
+    }
+
+    public void addNode(@NotNull Node node)
     {
         nodes.add(node);
     }
 
-    public void addEdge(Edge edge)
+    public void addNode(@NotNull String name)
     {
-        edges.add(edge);
+        nodes.add(new Node(name));
     }
 
-    public void deleteEdge(String fromNode, String toNode)
+    public void addEdge(@NotNull Edge edge, @NotNull int weight)
     {
-        for (Edge edge: edges)
-        {
-            if (edge.getFromNode().equals(fromNode) && edge.getToNode().equals(toNode))
-            {
-                edges.remove(edge);
-                break;
-            }
-        }
+        if (weight < 0)
+            throw new NegativeWeightException();
+
+        if (!(nodes.contains(edge.getToNode()) && nodes.contains(edge.getFromNode())))
+            throw new NoSuchNodeException();
+
+        edges.putIfAbsent(edge, weight);
     }
 
-    public void deleteNode(String name)
+    public void addEdge(@NotNull String fromNode, @NotNull String toNode, @NotNull int weight)
     {
-        for (Node node : nodes)
-        {
-            if (node.getName().equals(name))
-            {
-                nodes.remove(node);
-                break;
-            }
-        }
+        Edge edge = new Edge(fromNode, toNode);
+
+        addEdge(edge, weight);
     }
 
-    public void changeNodeName(String oldName, String newName)
+    public void deleteEdge(@NotNull String fromNode, @NotNull String toNode)
     {
-        for (Node node : nodes)
-        {
-            if (node.getName().equals(oldName))
-                node.setName(newName);
-        }
+        edges.remove(new Edge(new Node(fromNode), new Node(toNode)));
+    }
+
+    public void deleteEdge(@NotNull Node fromNode, @NotNull Node toNode)
+    {
+        edges.remove(new Edge(fromNode, toNode));
+    }
+
+    public void deleteEdge(@NotNull Edge edge)
+    {
+        edges.remove(edge);
+    }
+
+    public void deleteNode(@NotNull String node)
+    {
+        nodes.remove(new Node(node));
+        deleteAllLinkedEdges(new Node(node));
+    }
+
+    public void deleteNode(@NotNull Node node)
+    {
+        nodes.remove(node);
+        deleteAllLinkedEdges(node);
+    }
+
+    public void changeNodeName(@NotNull String oldName, @NotNull String newName)
+    {
+        if (nodes.contains(new Node(newName)))
+            throw new NodeAlreadyExistsException();
+
+        if (!nodes.contains(new Node(oldName)))
+            throw new NoSuchNodeException();
+
+        nodes.remove(new Node(oldName));
+        nodes.add(new Node(newName));
 
         changeNodeNameInEdges(oldName, newName);
     }
 
-    public void changeEdgeWeight(String fromNode, String toNode, int newWeight)
+    public void changeEdgeWeight(@NotNull String fromNode, @NotNull String toNode, @NotNull int newWeight)
     {
-        for (Edge edge: edges)
-        {
-            if (edge.getFromNode().equals(fromNode) && edge.getToNode().equals(toNode))
-                edge.setWeight(newWeight);
-        }
+        changeEdgeWeight(new Edge(new Node(fromNode), new Node(toNode)), newWeight);
     }
 
-    public void changeEdgeWeight(Edge e, int newWeight)
+    public void changeEdgeWeight(@NotNull Edge edge, @NotNull int newWeight)
     {
-        for (Edge edge: edges)
-        {
-            if (edge.getFromNode().equals(e.getFromNode()) &&
-                    edge.getToNode().equals(e.getToNode()))
-                edge.setWeight(newWeight);
-        }
+        if (!edges.containsKey(edge))
+            throw new NoSuchEdgeException();
+
+        edges.put(edge, newWeight);
     }
 
-    public HashSet<Edge> getIncomingEdges(String nodeName)
+    public HashSet<WeightedEdge> getIncomingEdges(@NotNull String nodeName)
     {
-        if (!nodes.contains(new Node(nodeName)))
+        return getIncomingEdges(new Node(nodeName));
+    }
+
+    public HashSet<WeightedEdge> getIncomingEdges(@NotNull Node node)
+    {
+        if (!nodes.contains(node))
             throw new NoSuchNodeException();
 
-        HashSet<Edge> incomingEdges = new HashSet<>();
+        HashSet<WeightedEdge> incomingEdges = new HashSet<>();
 
-        for (Edge edge: edges)
+        for (Map.Entry<Edge, Integer> e : edges.entrySet())
         {
-            if (edge.getToNode().equals(nodeName))
-                incomingEdges.add(edge);
+            if (e.getKey().getToNode().equals(node))
+                incomingEdges.add(new WeightedEdge(e.getKey(), e.getValue()));
         }
 
         return incomingEdges;
     }
 
-    public HashSet<Edge> getIncomingEdges(Node node)
+    public HashSet<WeightedEdge> getOutgoingEdges(@NotNull String nodeName)
+    {
+        return getOutgoingEdges(new Node(nodeName));
+    }
+
+    public HashSet<WeightedEdge> getOutgoingEdges(@NotNull Node node)
     {
         if (!nodes.contains(node))
             throw new NoSuchNodeException();
 
-        HashSet<Edge> incomingEdges = new HashSet<>();
+        HashSet<WeightedEdge> outgoingEdges = new HashSet<>();
 
-        for (Edge edge: edges)
+        for (Map.Entry<Edge, Integer> e : edges.entrySet())
         {
-            if (edge.getToNode().equals(node.getName()))
-                incomingEdges.add(edge);
-        }
-
-        return incomingEdges;
-    }
-
-    public HashSet<Edge> getOutgoingEdges(String nodeName)
-    {
-        if (!nodes.contains(new Node(nodeName)))
-            throw new NoSuchNodeException();
-
-        HashSet<Edge> outgoingEdges = new HashSet<>();
-
-        for (Edge edge: edges)
-        {
-            if (edge.getFromNode().equals(nodeName))
-                outgoingEdges.add(edge);
-        }
-
-        return outgoingEdges;
-    }
-
-    public HashSet<Edge> getOutgoingEdges(Node node)
-    {
-        if (!nodes.contains(node))
-            throw new NoSuchNodeException();
-
-        HashSet<Edge> outgoingEdges = new HashSet<>();
-
-        for (Edge edge: edges)
-        {
-            if (edge.getFromNode().equals(node.getName()))
-                outgoingEdges.add(edge);
+            if (e.getKey().getFromNode().equals(node))
+                outgoingEdges.add(new WeightedEdge(e.getKey(), e.getValue()));
         }
 
         return outgoingEdges;
@@ -159,16 +167,69 @@ public class Graph
         nodes.clear();
     }
 
+    public HashSet<Node> getNodes()
+    {
+       return nodes;
+    }
+
+    public Set<Edge> getEdges()
+    {
+        return edges.keySet();
+    }
+
+    public Set<WeightedEdge> getWeightedEdges()
+    {
+        HashSet<WeightedEdge> weightedEdges = new HashSet<>();
+
+        for (Edge edge : edges.keySet())
+        {
+            weightedEdges.add(new WeightedEdge(edge, edges.get(edge)));
+        }
+
+        return weightedEdges;
+    }
+
+    private void deleteAllLinkedEdges(Node node)
+    {
+        ArrayList<Edge> edgesToRemove = new ArrayList<>();
+
+        for (Edge edge : edges.keySet())
+        {
+            if (edge.getToNode().equals(node) || edge.getFromNode().equals(node))
+                edgesToRemove.add(edge);
+        }
+
+        for (Edge edge : edgesToRemove)
+        {
+            edges.remove(edge);
+        }
+    }
+
     private void changeNodeNameInEdges(String oldName, String newName)
     {
-        for (Edge edge: edges)
-        {
-            if (edge.getFromNode().equals(oldName))
-                edge.setFromNode(newName);
+        ArrayList<WeightedEdge> edgesToChange = new ArrayList<>();
 
-            if (edge.getToNode().equals(oldName))
-                edge.setToNode(newName);
+        for (Edge edge : edges.keySet())
+        {
+            if (edge.getToNode().getName().equals(oldName) ||
+                    edge.getFromNode().getName().equals(oldName))
+                edgesToChange.add(new WeightedEdge(edge, edges.get(edge)));
         }
+
+        for (WeightedEdge wEdge : edgesToChange)
+        {
+            edges.remove(wEdge.getEdge());
+
+            if (wEdge.getEdge().getFromNode().getName().equals(oldName))
+                wEdge.getEdge().setFromNode(new Node(newName));
+
+            if (wEdge.getEdge().getToNode().getName().equals(oldName))
+                wEdge.getEdge().setToNode(new Node(newName));
+
+            edges.put(wEdge.getEdge(), wEdge.getWeight());
+        }
+
+
     }
 
     @Override
@@ -189,10 +250,13 @@ public class Graph
         sb.append("Edges: ");
         sb.append("\n");
 
-        for (Edge edge : edges)
+        for (Map.Entry<Edge, Integer> e : edges.entrySet())
         {
             sb.append("\t");
-            sb.append(edge.toString());
+            sb.append(e.getKey().toString());
+            sb.append(" (");
+            sb.append(e.getValue());
+            sb.append(")");
             sb.append("\n");
         }
 

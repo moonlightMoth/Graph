@@ -1,69 +1,56 @@
-import com.sun.org.apache.xpath.internal.operations.Neg;
+import com.sun.istack.internal.NotNull;
 
 class Edge
 {
-    private String fromNode;
-    private String toNode;
-    private int weight;
+    private Node fromNode;
+    private Node toNode;
 
     private final int HASHCODE_DIVIDER = 3;
     private final int HASHCODE_MULTIPLIER = 13;
 
-    Edge (String fromNode, String toNode, int weight)
-    {
-        if (weight < 0)
-            throw new NegativeWeightException();
-
-        this.fromNode = fromNode;
-        this.toNode = toNode;
-        this.weight = weight;
-    }
-
-    void setFromNode(String fromNode)
+    public Edge (@NotNull Node fromNode, @NotNull Node toNode)
     {
         this.fromNode = fromNode;
-    }
-
-    void setToNode(String toNode)
-    {
         this.toNode = toNode;
     }
 
-    String getFromNode()
+    public Edge (@NotNull String fromNode, @NotNull String toNode)
+    {
+        this.fromNode = new Node(fromNode);
+        this.toNode = new Node(toNode);
+    }
+
+    void setFromNode(@NotNull Node fromNode)
+    {
+        this.fromNode = fromNode;
+    }
+
+    void setToNode(@NotNull Node toNode)
+    {
+        this.toNode = toNode;
+    }
+
+    Node getFromNode()
     {
         return fromNode;
     }
 
-    String getToNode()
+    Node getToNode()
     {
         return toNode;
-    }
-
-    void setWeight(int weight)
-    {
-        if (weight < 0)
-            throw new NegativeWeightException();
-
-        this.weight = weight;
-    }
-
-    int getWeight()
-    {
-        return weight;
     }
 
     @Override
     public String toString()
     {
-        return fromNode + " -> " + toNode + " = " + weight;
+        return fromNode + " -> " + toNode;
     }
 
     @Override
     public int hashCode()
     {
         return toNode.hashCode() / HASHCODE_DIVIDER +
-                fromNode.hashCode() / HASHCODE_DIVIDER +
-                weight * HASHCODE_MULTIPLIER;
+                fromNode.hashCode() / HASHCODE_DIVIDER;
     }
 
     @Override

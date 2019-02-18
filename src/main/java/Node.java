@@ -1,10 +1,12 @@
+import com.sun.istack.internal.NotNull;
+
 class Node
 {
     private String name;
 
     private final int HASHCODE_MULTIPLIER = 3;
 
-    Node(String name)
+    Node(@NotNull String name)
     {
         this.name = name;
     }
@@ -14,7 +16,7 @@ class Node
         return name;
     }
 
-    void setName(String name)
+    void setName(@NotNull String name)
     {
         this.name = name;
     }

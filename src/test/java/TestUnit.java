@@ -3,12 +3,14 @@ import org.junit.jupiter.api.function.Executable;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.NoSuchElementException;
 
 class TestUnit
 {
     @Test
-    void addNode()
+    void addNodeTest()
     {
         Graph actual = new Graph();
         actual.addNode(new Node("sa"));
@@ -17,32 +19,63 @@ class TestUnit
         as.add(new Node("sa"));
         Graph expected = new Graph(as);
 
-        System.out.println(actual);
-
         assertEquals(expected, actual);
     }
 
     @Test
-    void addEdge()
+    void addEdgeTest()
     {
         Graph graph = new Graph();
+        graph.addNode("a");
+        graph.addNode("b");
+        graph.addNode("c");
+        graph.addEdge("a", "b", 13);
 
-        graph.addEdge(new Edge("a", "b", 34));
+        HashSet<WeightedEdge> expected = new HashSet<>();
 
-        HashSet<Edge> edges = new HashSet<>();
-        edges.add(new Edge("a", "b", 34));
-        Graph graph1 = new Graph(new HashSet<Node>(), edges);
+        expected.add(new WeightedEdge(new Edge("a", "b"), 13));
 
-        assertEquals(graph, graph1);
+        assertEquals(expected, graph.getWeightedEdges());
+
+        Executable exec = () -> {
+            Graph g = new Graph();
+
+            g.addEdge(new Edge("a", "b"), 13);
+        };
+
+        Executable exec1 = () -> {
+            Graph g = new Graph();
+
+            g.addEdge("a", "b", 13);
+        };
+
+        Executable exec2 = () -> {
+            Graph g = new Graph();
+
+            g.addNode("a");
+            g.addEdge("a", "b", 13);
+        };
+
+        Executable exec3 = () -> {
+            Graph g = new Graph();
+
+            g.addNode("a");
+            g.addEdge("a", "b", -13);
+        };
+
+        assertThrows(NoSuchNodeException.class, exec);
+        assertThrows(NoSuchNodeException.class, exec1);
+        assertThrows(NoSuchNodeException.class, exec2);
+        assertThrows(NegativeWeightException.class, exec3);
     }
 
     @Test
-    void deleteEdge()
+    void deleteEdgeTest()
     {
         Graph actual = createSimpleGraph();
 
-        actual.addEdge(new Edge("as", "sa", 21));
-        actual.deleteEdge("as", "sa");
+        actual.addEdge(new Edge("b", "d"), 21);
+        actual.deleteEdge("b", "d");
 
         Graph expected = createSimpleGraph();
 
@@ -50,12 +83,16 @@ class TestUnit
     }
 
     @Test
-    void deleteNode()
+    void deleteNodeTest()
     {
         Graph actual = createSimpleGraph();
 
-        actual.addNode(new Node("asa"));
-        actual.deleteNode("asa");
+        actual.addNode("z");
+        actual.addNode("x");
+        actual.addEdge("z", "x", 34);
+        actual.addEdge("x", "b", 12);
+        actual.deleteNode("x");
+        actual.deleteNode("z");
 
         Graph expected = createSimpleGraph();
 
@@ -63,80 +100,77 @@ class TestUnit
     }
 
     @Test
-    void changeNodeName()  //TODO
+    void changeNodeNameTest()
     {
-        Graph actual = createSimpleGraph();
+        Graph actual = new Graph();
 
-        actual.changeNodeName("a", "r");
+        actual.addNode("a");
+        actual.addNode("b");
+        actual.addNode("c");
+        actual.addEdge("a", "b", 13);
+        actual.addEdge("b", "c", 34);
+        actual.changeNodeName("b", "r");
 
-        Graph expected = createSimpleGraph();
+        Graph expected = new Graph();
 
-        expected.changeNodeName("a", "r");
+        expected.addNode("a");
+        expected.addNode("r");
+        expected.addNode("c");
+        expected.addEdge("a", "r", 13);
+        expected.addEdge("r", "c", 34);
 
-        HashSet<Node> nodes1 = new HashSet<>();
-        nodes1.add(new Node("a"));
+        assertEquals(expected, actual);
 
-        HashSet<Node> nodes2 = new HashSet<>();
-        nodes2.add(new Node("r"));
+        Executable exec = () -> {
+            Graph g = createSimpleGraph();
 
-        for (Node node : nodes1)
-            node.setName("r");
+            g.changeNodeName("j", "f");
+        };
 
+        Executable exec1 = () -> {
+            Graph g = createSimpleGraph();
 
-        System.out.println(nodes2.contains(new Node("r")));
+            g.changeNodeName("a", "b");
+        };
 
-//        Graph expected = new Graph();
-//
-//        expected.addNode(new Node("r"));
-//        expected.addNode(new Node("b"));
-//        expected.addNode(new Node("c"));
-//        expected.addNode(new Node("d"));
-//
-//        expected.addEdge(new Edge("r", "b", 10));
-//        expected.addEdge(new Edge("b", "r", 100));
-//        expected.addEdge(new Edge("b", "c", 13));
-//        expected.addEdge(new Edge("d", "c", 3));
-
-        System.out.println(expected.hashCode());
-        System.out.println(actual.hashCode());
-        System.out.println(actual.equals(expected));
-        System.out.println();
-        System.out.println(actual.nodes);
-        System.out.println(expected.nodes);
-        System.out.println(actual.edges);
-        System.out.println(actual.edges);
-        System.out.println(actual.edges.equals(expected.edges));
-        System.out.println(actual.nodes.equals(expected.nodes));
-        System.out.println();
-        System.out.println(nodes1.equals(nodes2));
-
-        //assertEquals(expected, actual);
+        assertThrows(NoSuchNodeException.class, exec);
+        assertThrows(NodeAlreadyExistsException.class, exec1);
     }
 
     @Test
-    void changeEdgeWeight() //TODO
+    void changeEdgeWeightTest()
     {
-        HashSet<Edge> expected = new HashSet<>();
+        HashSet<WeightedEdge> expected = new HashSet<>();
 
-        expected.add(new Edge("b", "c", 13));
-        expected.add(new Edge("d", "c", 112233));
+        expected.add(new WeightedEdge(new Edge("a", "b"), 12));
 
-        Graph graph = createSimpleGraph();
+        Graph graph = new Graph();
 
-        graph.addEdge(new Edge("d", "c", 112233));
+        graph.addNode("a");
+        graph.addNode("b");
+        graph.addEdge("a", "b", 344);
+        graph.changeEdgeWeight("a", "b", 12);
 
-        assertEquals(expected, graph.getIncomingEdges("c"));
+        assertEquals(expected, graph.getWeightedEdges());
+
+        Executable exec = () -> {
+            Graph g = createSimpleGraph();
+
+            g.changeEdgeWeight("t", "d", 56);
+        };
+
+        assertThrows(NoSuchEdgeException.class, exec);
     }
 
     @Test
-    void getIncomingEdges()
+    void getIncomingEdgesTest() //TODO
     {
-        HashSet<Edge> expected = new HashSet<>();
+        HashSet<WeightedEdge> expected = new HashSet<>();
 
-        expected.add(new Edge("b", "c", 13));
-        expected.add(new Edge("d", "c", 3));
+        expected.add(new WeightedEdge(new Edge("b", "c"), 13));
+        expected.add(new WeightedEdge(new Edge("d", "c"), 3));
 
-        HashSet<Edge> actual = createSimpleGraph().getIncomingEdges("c");
+        HashSet<WeightedEdge> actual = createSimpleGraph().getIncomingEdges("c");
 
         assertEquals(expected, actual);
 
@@ -146,14 +180,14 @@ class TestUnit
     }
 
     @Test
-    void getOutgoingEdges()
+    void getOutgoingEdgesTest()
     {
-        HashSet<Edge> expected = new HashSet<>();
+        HashSet<WeightedEdge> expected = new HashSet<>();
 
-        expected.add(new Edge("b", "a", 100));
-        expected.add(new Edge("b", "c", 13));
+        expected.add(new WeightedEdge(new Edge("b", "a"), 100));
+        expected.add(new WeightedEdge(new Edge("b", "c"), 13));
 
-        HashSet<Edge> actual = createSimpleGraph().getOutgoingEdges("b");
+        HashSet<WeightedEdge> actual = createSimpleGraph().getOutgoingEdges("b");
 
         assertEquals(expected, actual);
 
@@ -163,7 +197,7 @@ class TestUnit
     }
 
     @Test
-    void clear()
+    void clearTest()
     {
         Graph expected = new Graph();
         Graph actual = createSimpleGraph();
@@ -174,9 +208,18 @@ class TestUnit
     }
 
     @Test
-    void negativeWeightException()
+    void negativeWeightExceptionTest()
     {
-        assertThrows(NegativeWeightException.class, new CreateGraphNegativeWeight());
+        Executable exec = () -> {
+            Graph graph = new Graph();
+
+            graph.addNode(new Node("a"));
+            graph.addNode(new Node("b"));
+
+            graph.addEdge(new Edge("a", "b"), -13);
+        };
+
+        assertThrows(NegativeWeightException.class, exec);
     }
 
     private Graph createSimpleGraph()
@@ -188,26 +231,11 @@ class TestUnit
         graph.addNode(new Node("c"));
         graph.addNode(new Node("d"));
 
-        graph.addEdge(new Edge("a", "b", 10));
-        graph.addEdge(new Edge("b", "a", 100));
-        graph.addEdge(new Edge("b", "c", 13));
-        graph.addEdge(new Edge("d", "c", 3));
+        graph.addEdge(new Edge("a", "b"), 10);
+        graph.addEdge(new Edge("b", "a"), 100);
+        graph.addEdge(new Edge("b", "c"), 13);
+        graph.addEdge(new Edge("d", "c"), 3);
 
         return graph;
     }
-
-    private class CreateGraphNegativeWeight implements Executable
-    {
-        @Override
-        public void execute() throws Throwable
-        {
-            Graph graph = new Graph();
-
-            graph.addNode(new Node("a"));
-            graph.addNode(new Node("b"));
-
-            graph.addEdge(new Edge("a", "b", -13));
-        }
-    }
-
 }
