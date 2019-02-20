@@ -6,12 +6,12 @@ class Node
 
     private final int HASHCODE_MULTIPLIER = 3;
 
-    Node(@NotNull String name)
+    public Node(@NotNull String name)
     {
         this.name = name;
     }
 
-    String getName()
+    public String getName()
     {
         return name;
     }

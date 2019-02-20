@@ -1,11 +1,10 @@
+import com.sun.xml.internal.ws.message.ByteArrayAttachment;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 class TestUnit //TODO check kraynie cases
 {
@@ -15,11 +14,10 @@ class TestUnit //TODO check kraynie cases
         Graph actual = new Graph();
         actual.addNode(new Node("sa"));
 
-        HashSet<Node> as = new HashSet<>();
+        ArrayList<Node> as = new ArrayList<>();
         as.add(new Node("sa"));
-        Graph expected = new Graph(as);
 
-        assertEquals(expected, actual);
+        assertEquals(as, actual.getNodes());
     }
 
     @Test
@@ -31,19 +29,13 @@ class TestUnit //TODO check kraynie cases
         graph.addNode("c");
         graph.addEdge("a", "b", 13);
 
-        HashSet<WeightedEdge> expected = new HashSet<>();
+        ArrayList<Edge> expected = new ArrayList<>();
 
-        expected.add(new WeightedEdge(new Edge("a", "b"), 13));
+        expected.add(new Edge("a", "b", 13));
 
-        assertEquals(expected, graph.getWeightedEdges());
+        assertEquals(expected, graph.getEdges());
 
         Executable exec = () -> {
-            Graph g = new Graph();
-
-            g.addEdge(new Edge("a", "b"), 13);
-        };
-
-        Executable exec1 = () -> {
             Graph g = new Graph();
 
             g.addEdge("a", "b", 13);
@@ -60,11 +52,11 @@ class TestUnit //TODO check kraynie cases
             Graph g = new Graph();
 
             g.addNode("a");
+            g.addNode("b");
             g.addEdge("a", "b", -13);
         };
 
         assertThrows(NoSuchNodeException.class, exec);
-        assertThrows(NoSuchNodeException.class, exec1);
         assertThrows(NoSuchNodeException.class, exec2);
         assertThrows(NegativeWeightException.class, exec3);
     }
@@ -74,7 +66,7 @@ class TestUnit //TODO check kraynie cases
     {
         Graph actual = createSimpleGraph();
 
-        actual.addEdge(new Edge("b", "d"), 21);
+        actual.addEdge("b", "d", 21);
         actual.deleteEdge("b", "d");
 
         Graph expected = createSimpleGraph();
@@ -140,9 +132,9 @@ class TestUnit //TODO check kraynie cases
     @Test
     void changeEdgeWeightTest()
     {
-        HashSet<WeightedEdge> expected = new HashSet<>();
+        ArrayList<Edge> expected = new ArrayList<>();
 
-        expected.add(new WeightedEdge(new Edge("a", "b"), 12));
+        expected.add(new Edge("a", "b", 12));
 
         Graph graph = new Graph();
 
@@ -151,7 +143,7 @@ class TestUnit //TODO check kraynie cases
         graph.addEdge("a", "b", 344);
         graph.changeEdgeWeight("a", "b", 12);
 
-        assertEquals(expected, graph.getWeightedEdges());
+        assertEquals(expected, graph.getEdges());
 
         Executable exec = () -> {
             Graph g = createSimpleGraph();
@@ -165,16 +157,16 @@ class TestUnit //TODO check kraynie cases
     @Test
     void getIncomingEdgesTest() //TODO
     {
-        HashSet<WeightedEdge> expected = new HashSet<>();
+        ArrayList<Edge> expected = new ArrayList<>();
 
-        expected.add(new WeightedEdge(new Edge("b", "c"), 13));
-        expected.add(new WeightedEdge(new Edge("d", "c"), 3));
+        expected.add(new Edge("b", "c", 13));
+        expected.add(new Edge("d", "c", 3));
 
-        HashSet<WeightedEdge> actual = createSimpleGraph().getIncomingEdges("c");
+        List<Edge> actual = createSimpleGraph().getIncomingEdges("c");
 
         assertEquals(expected, actual);
 
-        actual = createSimpleGraph().getIncomingEdges(new Node("c"));
+        actual = createSimpleGraph().getIncomingEdges("c");
 
         assertEquals(expected, actual);
     }
@@ -182,16 +174,16 @@ class TestUnit //TODO check kraynie cases
     @Test
     void getOutgoingEdgesTest()
     {
-        HashSet<WeightedEdge> expected = new HashSet<>();
+        ArrayList<Edge> expected = new ArrayList<>();
 
-        expected.add(new WeightedEdge(new Edge("b", "a"), 100));
-        expected.add(new WeightedEdge(new Edge("b", "c"), 13));
+        expected.add(new Edge("b", "a", 100));
+        expected.add(new Edge("b", "c", 13));
 
-        HashSet<WeightedEdge> actual = createSimpleGraph().getOutgoingEdges("b");
+        List<Edge> actual = createSimpleGraph().getOutgoingEdges("b");
 
         assertEquals(expected, actual);
 
-        actual = createSimpleGraph().getOutgoingEdges(new Node("b"));
+        actual = createSimpleGraph().getOutgoingEdges("b");
 
         assertEquals(expected, actual);
     }
@@ -216,7 +208,7 @@ class TestUnit //TODO check kraynie cases
             graph.addNode(new Node("a"));
             graph.addNode(new Node("b"));
 
-            graph.addEdge(new Edge("a", "b"), -13);
+            graph.addEdge("a", "b", -13);
         };
 
         assertThrows(NegativeWeightException.class, exec);
@@ -231,10 +223,10 @@ class TestUnit //TODO check kraynie cases
         graph.addNode(new Node("c"));
         graph.addNode(new Node("d"));
 
-        graph.addEdge(new Edge("a", "b"), 10);
-        graph.addEdge(new Edge("b", "a"), 100);
-        graph.addEdge(new Edge("b", "c"), 13);
-        graph.addEdge(new Edge("d", "c"), 3);
+        graph.addEdge("a", "b", 10);
+        graph.addEdge("b", "a", 100);
+        graph.addEdge("b", "c", 13);
+        graph.addEdge("d", "c", 3);
 
         return graph;
     }
