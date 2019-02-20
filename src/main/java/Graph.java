@@ -47,7 +47,7 @@ public class Graph
         for (Edge e : edges)
         {
             if (e.getToNode().equals(edge.getToNode()) &&
-                    e.getFromNode().equals(edge.getToNode()))
+                    e.getFromNode().equals(edge.getFromNode()))
                 return false;
         }
 
@@ -158,6 +158,11 @@ public class Graph
     {
         edges.clear();
         nodes.clear();
+    }
+
+    public void clearEdges()
+    {
+        edges.clear();
     }
 
     public List<Node> getNodes()

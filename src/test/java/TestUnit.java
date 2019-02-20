@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.*;
 
-class TestUnit //TODO check kraynie cases
+class TestUnit
 {
     @Test
     void addNodeTest()
@@ -18,6 +18,8 @@ class TestUnit //TODO check kraynie cases
         as.add(new Node("sa"));
 
         assertEquals(as, actual.getNodes());
+        assertTrue(actual.addNode("re"));
+        assertFalse(actual.addNode("re"));
     }
 
     @Test
@@ -34,6 +36,9 @@ class TestUnit //TODO check kraynie cases
         expected.add(new Edge("a", "b", 13));
 
         assertEquals(expected, graph.getEdges());
+        assertTrue(graph.addEdge("a", "c", 13));
+        assertFalse(graph.addEdge("a", "c", 13));
+        assertFalse(graph.addEdge("a", "c", 1333));
 
         Executable exec = () -> {
             Graph g = new Graph();
@@ -72,6 +77,7 @@ class TestUnit //TODO check kraynie cases
         Graph expected = createSimpleGraph();
 
         assertEquals(expected, actual);
+        assertFalse(actual.deleteEdge("a", "s"));
     }
 
     @Test
@@ -89,6 +95,9 @@ class TestUnit //TODO check kraynie cases
         Graph expected = createSimpleGraph();
 
         assertEquals(expected, actual);
+        assertFalse(actual.deleteNode("tt"));
+        actual.addNode("owo");
+        assertTrue(actual.deleteNode("owo"));
     }
 
     @Test
@@ -155,20 +164,28 @@ class TestUnit //TODO check kraynie cases
     }
 
     @Test
-    void getIncomingEdgesTest() //TODO
+    void getIncomingEdgesTest()
     {
         ArrayList<Edge> expected = new ArrayList<>();
 
         expected.add(new Edge("b", "c", 13));
         expected.add(new Edge("d", "c", 3));
 
-        List<Edge> actual = createSimpleGraph().getIncomingEdges("c");
+        Graph graph = createSimpleGraph();
 
-        assertEquals(expected, actual);
+        assertEquals(expected, graph.getIncomingEdges("c"));
 
-        actual = createSimpleGraph().getIncomingEdges("c");
+        graph.deleteEdge("b", "c");
+        graph.deleteEdge("d", "c");
 
-        assertEquals(expected, actual);
+        assertEquals(new ArrayList<Edge>(), graph.getIncomingEdges("c"));
+
+        Executable exec = () -> {
+            Graph g = new Graph();
+            g.getIncomingEdges("a");
+        };
+
+        assertThrows(NoSuchNodeException.class, exec);
     }
 
     @Test
@@ -179,13 +196,21 @@ class TestUnit //TODO check kraynie cases
         expected.add(new Edge("b", "a", 100));
         expected.add(new Edge("b", "c", 13));
 
-        List<Edge> actual = createSimpleGraph().getOutgoingEdges("b");
+        Graph graph = createSimpleGraph();
 
-        assertEquals(expected, actual);
+        assertEquals(expected, graph.getOutgoingEdges("b"));
 
-        actual = createSimpleGraph().getOutgoingEdges("b");
+        graph.deleteEdge("b", "c");
+        graph.deleteEdge("b", "a");
 
-        assertEquals(expected, actual);
+        assertEquals(new ArrayList<Edge>(), graph.getOutgoingEdges("b"));
+
+        Executable exec = () -> {
+            Graph g = new Graph();
+            g.getOutgoingEdges("a");
+        };
+
+        assertThrows(NoSuchNodeException.class, exec);
     }
 
     @Test
@@ -197,6 +222,59 @@ class TestUnit //TODO check kraynie cases
         actual.clear();
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    void getNodesTest()
+    {
+        ArrayList<Node> expected = new ArrayList<>();
+
+        Graph graph = new Graph();
+
+        assertEquals(expected, graph.getNodes());
+
+        expected.add(new Node("t"));
+        graph.addNode("t");
+
+        assertEquals(expected, graph.getNodes());
+
+        expected.remove(0);
+        graph.deleteNode("t");
+
+        assertEquals(expected, graph.getNodes());
+    }
+
+    @Test
+    void getEdgesTest()
+    {
+        ArrayList<Edge> expected = new ArrayList<>();
+
+        Graph graph = new Graph();
+
+        assertEquals(expected, graph.getEdges());
+
+        graph.addNode("a");
+        graph.addNode("b");
+        expected.add(new Edge("a", "b", 13));
+        graph.addEdge("a", "b", 13);
+
+        assertEquals(expected, graph.getEdges());
+
+        expected.remove(0);
+        graph.deleteEdge("a", "b");
+
+        assertEquals(expected, graph.getEdges());
+    }
+
+    @Test
+    void clearEdgesTest()
+    {
+        Graph expected = new Graph();
+        Graph actual = createSimpleGraph();
+
+        actual.clearEdges();
+
+        assertEquals(expected.getEdges(), actual.getEdges());
     }
 
     @Test
