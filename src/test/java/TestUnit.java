@@ -278,6 +278,26 @@ class TestUnit
     }
 
     @Test
+    void differentAdditionOrderTest()
+    {
+        Graph graph1 = new Graph();
+        graph1.addNode("as");
+        graph1.addNode("sa");
+        graph1.addNode("ta");
+        graph1.addEdge("as", "sa", 13);
+        graph1.addEdge("sa", "ta", 14);
+
+        Graph graph2 = new Graph();
+        graph2.addNode("sa");
+        graph2.addNode("as");
+        graph2.addNode("ta");
+        graph2.addEdge("sa", "ta", 14);
+        graph2.addEdge("as", "sa", 13);
+
+        assertEquals(graph1, graph2);
+    }
+
+    @Test
     void negativeWeightExceptionTest()
     {
         Executable exec = () -> {

@@ -9,16 +9,6 @@ class Edge
     private final int HASHCODE_DIVIDER = 3;
     private final int HASHCODE_MULTIPLIER = 13;
 
-    public Edge (@NotNull Node fromNode, @NotNull Node toNode, @NotNull int weight)
-    {
-        if (weight < 0)
-            throw new NegativeWeightException();
-
-        this.weight = weight;
-        this.fromNode = fromNode;
-        this.toNode = toNode;
-    }
-
     public Edge (@NotNull String fromNode, @NotNull String toNode, @NotNull int weight)
     {
         if (weight < 0)

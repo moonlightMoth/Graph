@@ -238,7 +238,9 @@ public class Graph
     public boolean equals(Object o)
     {
         return o instanceof Graph &&
-                ((Graph) o).edges.equals(edges) &&
-                ((Graph) o).nodes.equals(nodes);
+                ((Graph) o).edges.containsAll(edges) &&
+                ((Graph) o).nodes.containsAll(nodes) &&
+                ((Graph) o).edges.size() == edges.size() &&
+                ((Graph) o).nodes.size() == nodes.size();
     }
 }
