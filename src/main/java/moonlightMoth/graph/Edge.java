@@ -8,8 +8,8 @@ public class Edge
     private Node toNode = null;
     private int weight;
 
-    private final int HASHCODE_DIVIDER = 3;
-    private final int HASHCODE_MULTIPLIER = 13;
+    private static final int HASHCODE_DIVIDER = 3;
+    private static final int HASHCODE_MULTIPLIER = 13;
 
     public Edge (@NotNull String fromNode, @NotNull String toNode, @NotNull int weight)
     {
@@ -36,7 +36,7 @@ public class Edge
         this.toNode = toNode;
     }
 
-    void setWeight(@NotNull int weight)  //notNull
+    void setWeight(int weight)
     {
         if (weight < 0)
             throw new NegativeWeightException();

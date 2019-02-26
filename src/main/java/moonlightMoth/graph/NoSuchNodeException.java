@@ -1,6 +1,8 @@
+package moonlightMoth.graph;
+
 import java.util.NoSuchElementException;
 
-class NoSuchNodeException extends NoSuchElementException
+public class NoSuchNodeException extends NoSuchElementException
 {
 
 }

@@ -10,7 +10,7 @@ public class Graph
     private List<Node> nodes;
     private List<Edge> edges;
 
-    private final int HASHCODE_DIVIDER = 2;//static
+    private static final int HASHCODE_DIVIDER = 2;
 
     public Graph()
     {
@@ -227,6 +227,8 @@ public class Graph
             sb.append(edge);
             sb.append("\n");
         }
+
+        sb.deleteCharAt(sb.length()-1);
 
         return sb.toString();
     }

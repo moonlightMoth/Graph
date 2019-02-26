@@ -1,10 +1,10 @@
-import com.sun.xml.internal.ws.message.ByteArrayAttachment;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import moonlightMoth.graph.*;
+
+import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
-
-import java.util.*;
 
 class TestUnit
 {
@@ -61,9 +61,18 @@ class TestUnit
             g.addEdge("a", "b", -13);
         };
 
+        Executable exec4 = () -> {
+            Graph g = new Graph();
+
+            g.addNode("a");
+            g.addNode("b");
+            g.addEdge("a", "b", -13);
+        };
+
         assertThrows(NoSuchNodeException.class, exec);
         assertThrows(NoSuchNodeException.class, exec2);
         assertThrows(NegativeWeightException.class, exec3);
+        assertThrows(NegativeWeightException.class, exec4);
     }
 
     @Test
@@ -298,6 +307,21 @@ class TestUnit
     }
 
     @Test
+    void toStringTest()
+    {
+        String expected = "Nodes: a, b, c, d\n" +
+                "Edges: \n" +
+                "\ta -> b (10)\n" +
+                "\tb -> a (100)\n" +
+                "\tb -> c (13)\n" +
+                "\td -> c (3)";
+
+        Graph graph = createSimpleGraph();
+
+        assertEquals(expected, graph.toString());
+    }
+
+    @Test
     void negativeWeightExceptionTest()
     {
         Executable exec = () -> {
@@ -310,6 +334,17 @@ class TestUnit
         };
 
         assertThrows(NegativeWeightException.class, exec);
+    }
+
+    @Test
+    void hashCodeTest()
+    {
+        Graph graph = createSimpleGraph();
+
+        Graph graph1 = createSimpleGraph();
+        graph1.changeNodeName("a", "r");
+
+        assertNotEquals(graph.hashCode(), graph1.hashCode());
     }
 
     private Graph createSimpleGraph()

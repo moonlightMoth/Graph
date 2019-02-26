@@ -1,10 +1,12 @@
+package moonlightMoth.graph;
+
 import com.sun.istack.internal.NotNull;
 
 public class Node
 {
     private String name;
 
-    private final int HASHCODE_MULTIPLIER = 3;
+    private static final int HASHCODE_MULTIPLIER = 3;
 
     public Node(@NotNull String name)
     {
