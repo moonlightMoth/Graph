@@ -1,12 +1,16 @@
+package moonlightMoth.graph;
+
 import com.sun.istack.internal.NotNull;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class Graph
 {
     private List<Node> nodes;
     private List<Edge> edges;
 
-    private final int HASHCODE_DIVIDER = 2;
+    private final int HASHCODE_DIVIDER = 2;//static
 
     public Graph()
     {

@@ -1,6 +1,6 @@
 import com.sun.istack.internal.NotNull;
 
-class Node
+public class Node
 {
     private String name;
 

@@ -1,6 +1,8 @@
+package moonlightMoth.graph;
+
 import com.sun.istack.internal.NotNull;
 
-class Edge
+public class Edge
 {
     private Node fromNode = null;
     private Node toNode = null;
@@ -34,7 +36,7 @@ class Edge
         this.toNode = toNode;
     }
 
-    void setWeight(@NotNull int weight)
+    void setWeight(@NotNull int weight)  //notNull
     {
         if (weight < 0)
             throw new NegativeWeightException();
