@@ -1,6 +1,6 @@
 package moonlightMoth.graph;
 
-import com.sun.istack.internal.NotNull;
+import org.jetbrains.annotations.NotNull;
 
 /** Node class represents node of graph */
 

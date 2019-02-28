@@ -1,9 +1,10 @@
 package moonlightMoth.graph;
 
-import com.sun.istack.internal.NotNull;
+import org.jetbrains.annotations.NotNull;
 
 /** Edge class represents connection between two Nodes
- * as weighted directed edge */
+ * as weighted directed edge.
+ * Edge consists of two Node objects */
 
 public class Edge
 {
@@ -17,7 +18,7 @@ public class Edge
     private static final int HASHCODE_DIVIDER = 3;
     private static final int HASHCODE_MULTIPLIER = 13;
 
-    /** Creates new Edge implementation. Initialises fromNode, toNode and weight
+    /** Creates new Edge instance. Initialises fromNode, toNode and weight.
      * @param fromNode Node from which edge goes
      * @param toNode Node to which edge goes
      * @param weight Edge weight, must be not negative

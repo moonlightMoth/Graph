@@ -3,6 +3,7 @@ import org.junit.jupiter.api.function.Executable;
 import moonlightMoth.graph.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -12,7 +13,7 @@ class TestUnit
     void addNodeTest()
     {
         Graph actual = new Graph();
-        actual.addNode(new Node("sa"));
+        actual.addNode("sa");
 
         ArrayList<Node> as = new ArrayList<>();
         as.add(new Node("sa"));
@@ -245,6 +246,10 @@ class TestUnit
         expected.add(new Node("t"));
         graph.addNode("t");
 
+        List<Node> as = graph.getNodes();
+
+        as.clear();
+
         assertEquals(expected, graph.getNodes());
 
         expected.remove(0);
@@ -266,6 +271,10 @@ class TestUnit
         graph.addNode("b");
         expected.add(new Edge("a", "b", 13));
         graph.addEdge("a", "b", 13);
+
+        List<Edge> as = graph.getEdges();
+
+        as.clear();
 
         assertEquals(expected, graph.getEdges());
 
@@ -327,8 +336,8 @@ class TestUnit
         Executable exec = () -> {
             Graph graph = new Graph();
 
-            graph.addNode(new Node("a"));
-            graph.addNode(new Node("b"));
+            graph.addNode("a");
+            graph.addNode("b");
 
             graph.addEdge("a", "b", -13);
         };
@@ -351,10 +360,10 @@ class TestUnit
     {
         Graph graph = new Graph();
 
-        graph.addNode(new Node("a"));
-        graph.addNode(new Node("b"));
-        graph.addNode(new Node("c"));
-        graph.addNode(new Node("d"));
+        graph.addNode("a");
+        graph.addNode("b");
+        graph.addNode("c");
+        graph.addNode("d");
 
         graph.addEdge("a", "b", 10);
         graph.addEdge("b", "a", 100);
